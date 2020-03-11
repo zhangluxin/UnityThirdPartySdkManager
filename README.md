@@ -1,0 +1,2 @@
+# UnityThirdPartySdkManager
+Unity第三方sdk管理
