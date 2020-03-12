@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEditor.iOS.Xcode;
 using UnityEngine;
@@ -114,13 +115,32 @@ namespace Editor.UnityThirdPartySdkManager
             var plistPath = Path.Combine(pathToBuiltProject, "Info.plist");
             var plistDocument = new PlistDocument();
             plistDocument.ReadFromFile(plistPath);
-            if (plistDocument.root["LSApplicationQueriesSchemes"].AsArray() == null)
+            if (config.schemes.Length > 0)
+                AddSchemes(plistDocument, config.schemes);
+            plistDocument.WriteToFile(plistPath);
+        }
+
+        /// <summary>
+        /// 添加Application Queries Schemes
+        /// </summary>
+        /// <param name="plistDocument"></param>
+        /// <param name="schemes"></param>
+        private static void AddSchemes(PlistDocument plistDocument, string[] schemes)
+        {
+            if (!plistDocument.root.values.ContainsKey("LSApplicationQueriesSchemes"))
             {
                 plistDocument.root.CreateArray("LSApplicationQueriesSchemes");
             }
 
-            plistDocument.root["LSApplicationQueriesSchemes"].AsArray().AddString("");
-            plistDocument.WriteToFile(plistPath);
+            var queriesSchemes = plistDocument.root["LSApplicationQueriesSchemes"].AsArray();
+            foreach (var scheme in schemes)
+            {
+                var isExist = queriesSchemes.values.Any(element => element.AsString() == scheme);
+                if (!isExist)
+                {
+                    queriesSchemes.AddString(scheme);
+                }
+            }
         }
 
         /// <summary>

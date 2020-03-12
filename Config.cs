@@ -36,8 +36,11 @@ namespace Editor.UnityThirdPartySdkManager
         /// 是否支持bitcode
         /// </summary>
         public bool bitCode;
-        
-        
+
+        /// <summary>
+        /// Application Queries Schemes
+        /// </summary>
+        public string[] schemes;
 
         #endregion
 

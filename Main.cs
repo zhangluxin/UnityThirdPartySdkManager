@@ -37,7 +37,7 @@ namespace Editor.UnityThirdPartySdkManager
         /// <returns></returns>
         private static Config ReadConfig()
         {
-            var configPath = Path.Combine(Application.dataPath, "Sdk", "config.json");
+            var configPath = Path.Combine(Application.dataPath, "..", "Sdk", "config.json");
             try
             {
                 var configJson = File.ReadAllText(configPath);
