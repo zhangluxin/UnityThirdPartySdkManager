@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -117,15 +118,17 @@ namespace Editor.UnityThirdPartySdkManager
             plistDocument.ReadFromFile(plistPath);
             if (config.schemes.Length > 0)
                 AddSchemes(plistDocument, config.schemes);
+            if (config.urlTypes.Count > 0)
+                AddUrlTypes(plistDocument, config.urlTypes);
             plistDocument.WriteToFile(plistPath);
         }
 
         /// <summary>
         /// 添加Application Queries Schemes
         /// </summary>
-        /// <param name="plistDocument"></param>
-        /// <param name="schemes"></param>
-        private static void AddSchemes(PlistDocument plistDocument, string[] schemes)
+        /// <param name="plistDocument">plist</param>
+        /// <param name="schemes">schemes</param>
+        private static void AddSchemes(PlistDocument plistDocument, IEnumerable<string> schemes)
         {
             if (!plistDocument.root.values.ContainsKey("LSApplicationQueriesSchemes"))
             {
@@ -140,6 +143,34 @@ namespace Editor.UnityThirdPartySdkManager
                 {
                     queriesSchemes.AddString(scheme);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 添加Url Type
+        /// </summary>
+        /// <param name="plistDocument">plist</param>
+        /// <param name="urlTypes">urlTypes</param>
+        private static void AddUrlTypes(PlistDocument plistDocument, Dictionary<string, string> urlTypes)
+        {
+            if (!plistDocument.root.values.ContainsKey("CFBundleURLTypes"))
+            {
+                plistDocument.root.CreateArray("CFBundleURLTypes");
+            }
+
+            foreach (var urlType in urlTypes)
+            {
+                if (char.IsDigit(urlType.Value[0]))
+                {
+                    Debug.LogError("urlType不能以数字开头");
+                    continue;
+                }
+
+                var typeDic = plistDocument.root["CFBundleURLTypes"].AsArray().AddDict();
+                typeDic.SetString("CFBundleTypeRole", "Editor");
+                typeDic.SetString("CFBundleURLName", urlType.Key);
+                typeDic.CreateArray("CFBundleURLSchemes");
+                typeDic["CFBundleURLSchemes"].AsArray().AddString(urlType.Value);
             }
         }
 

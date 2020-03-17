@@ -1,6 +1,5 @@
 using System;
-using System.IO;
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace Editor.UnityThirdPartySdkManager
 {
@@ -41,6 +40,11 @@ namespace Editor.UnityThirdPartySdkManager
         /// Application Queries Schemes
         /// </summary>
         public string[] schemes;
+
+        /// <summary>
+        /// URL Types
+        /// </summary>
+        public Dictionary<string, string> urlTypes;
 
         #endregion
 

@@ -32,7 +32,11 @@ Unity第三方sdk管理
     "openapp",
     "weixin",
     "weixinUlink"
-  ]
+  ],
+  "urlTypes": {
+    "weixin": "wx111111111111111111",
+    "baidu": "baidu1111111111111111"
+  }
 }
 ```
 ## config释义
@@ -44,7 +48,8 @@ iosVersion | ios版本 | 不要低于Unity里的设置最小版本
 podList | cocoapods引用库列表 | 不用的记得删除
 iosSdkPath | ios sdk 保存路径 | 相对根目录的路径
 bitCode | 是否支持bitcode | 有些傻*第三方一直不支持
-schemes | 阿萨德 | 不用的记得删除
+schemes | 添加ApplicationQueriesSchemes | 不用的记得删除
+urlTypes | 添加urlType | 不用的记得删除
     
 
 
