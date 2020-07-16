@@ -5,7 +5,6 @@ Unity第三方sdk管理
 用于Unity项目接入第三方sdk，例如微信，百度地图等
 
 ## 使用方法
-作为子模块添加到`Assets/Editor/UnityThirdPartySdkManager`
 
 根目录（*和Assets平级*）创建`Sdk`目录，目录结构为
 ```
