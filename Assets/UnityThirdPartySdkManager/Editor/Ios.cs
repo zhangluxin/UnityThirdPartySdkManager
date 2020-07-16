@@ -7,15 +7,15 @@ using UnityEditor.iOS.Xcode;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Editor.UnityThirdPartySdkManager
+namespace UnityThirdPartySdkManager.Editor
 {
     /// <summary>
-    /// IOS打包
+    ///     IOS打包
     /// </summary>
     public static class Ios
     {
         /// <summary>
-        /// 执行打包
+        ///     执行打包
         /// </summary>
         /// <param name="pathToBuiltProject">打包工程路径</param>
         /// <param name="config">配置</param>
@@ -34,17 +34,14 @@ namespace Editor.UnityThirdPartySdkManager
         }
 
         /// <summary>
-        /// 生成cocoapod
+        ///     生成cocoapod
         /// </summary>
         /// <param name="pathToBuiltProject">打包工程路径</param>
         /// <param name="config">配置</param>
         private static void GeneratePodfile(string pathToBuiltProject, Config config)
         {
             var podfilePath = pathToBuiltProject + "/Podfile";
-            if (File.Exists(podfilePath))
-            {
-                File.Delete(podfilePath);
-            }
+            if (File.Exists(podfilePath)) File.Delete(podfilePath);
 
             var streamWriter = new StreamWriter(podfilePath);
             var allstr = new StringBuilder();
@@ -52,10 +49,7 @@ namespace Editor.UnityThirdPartySdkManager
             allstr.Append($"platform :ios, '{config.iosVersion}'\n");
             allstr.Append("\n");
             allstr.Append("target 'UnityFramework' do\n");
-            foreach (var pod in config.podList)
-            {
-                allstr.Append($"pod '{pod}'\n");
-            }
+            foreach (var pod in config.podList) allstr.Append($"pod '{pod}'\n");
 
             allstr.Append("end\n");
             streamWriter.Write(allstr);
@@ -81,7 +75,7 @@ namespace Editor.UnityThirdPartySdkManager
         }
 
         /// <summary>
-        /// 修改pbxproj文件
+        ///     修改pbxproj文件
         /// </summary>
         /// <param name="pathToBuiltProject">打包工程路径</param>
         /// <param name="config">配置</param>
@@ -99,7 +93,7 @@ namespace Editor.UnityThirdPartySdkManager
         }
 
         /// <summary>
-        /// 关掉bitcode
+        ///     关掉bitcode
         /// </summary>
         private static void CloseBitCode(PBXProject pbxProject, string target)
         {
@@ -107,7 +101,7 @@ namespace Editor.UnityThirdPartySdkManager
         }
 
         /// <summary>
-        /// 修改plist
+        ///     修改plist
         /// </summary>
         /// <param name="pathToBuiltProject">打包工程路径</param>
         /// <param name="config">配置</param>
@@ -124,39 +118,32 @@ namespace Editor.UnityThirdPartySdkManager
         }
 
         /// <summary>
-        /// 添加Application Queries Schemes
+        ///     添加Application Queries Schemes
         /// </summary>
         /// <param name="plistDocument">plist</param>
         /// <param name="schemes">schemes</param>
         private static void AddSchemes(PlistDocument plistDocument, IEnumerable<string> schemes)
         {
             if (!plistDocument.root.values.ContainsKey("LSApplicationQueriesSchemes"))
-            {
                 plistDocument.root.CreateArray("LSApplicationQueriesSchemes");
-            }
 
             var queriesSchemes = plistDocument.root["LSApplicationQueriesSchemes"].AsArray();
             foreach (var scheme in schemes)
             {
                 var isExist = queriesSchemes.values.Any(element => element.AsString() == scheme);
-                if (!isExist)
-                {
-                    queriesSchemes.AddString(scheme);
-                }
+                if (!isExist) queriesSchemes.AddString(scheme);
             }
         }
 
         /// <summary>
-        /// 添加Url Type
+        ///     添加Url Type
         /// </summary>
         /// <param name="plistDocument">plist</param>
         /// <param name="urlTypes">urlTypes</param>
         private static void AddUrlTypes(PlistDocument plistDocument, Dictionary<string, string> urlTypes)
         {
             if (!plistDocument.root.values.ContainsKey("CFBundleURLTypes"))
-            {
                 plistDocument.root.CreateArray("CFBundleURLTypes");
-            }
 
             foreach (var urlType in urlTypes)
             {
@@ -175,7 +162,7 @@ namespace Editor.UnityThirdPartySdkManager
         }
 
         /// <summary>
-        /// 添加sdk文件
+        ///     添加sdk文件
         /// </summary>
         /// <param name="pbxProject">打包工程路径</param>
         /// <param name="target">配置的target("默认为UnityFramework")</param>
@@ -189,7 +176,7 @@ namespace Editor.UnityThirdPartySdkManager
         }
 
         /// <summary>
-        /// 添加文件
+        ///     添加文件
         /// </summary>
         /// <param name="directory">目录</param>
         /// <param name="pbxProject">打包工程</param>
@@ -204,9 +191,7 @@ namespace Editor.UnityThirdPartySdkManager
             }
 
             foreach (var directoryInfo in directory.GetDirectories())
-            {
                 AddFiles(directoryInfo, pbxProject, target, $"{path}/{directoryInfo.Name}");
-            }
         }
     }
 }
