@@ -25,9 +25,19 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         public bool enableBaiduMap;
 
         /// <summary>
+        /// 百度地图
+        /// </summary>
+        public BaiduMap baiduMap;
+
+        /// <summary>
         /// 支持极光推送
         /// </summary>
         public bool enableJpush;
+
+        /// <summary>
+        /// 极光推送
+        /// </summary>
+        public JPush jPush;
 
         /// <summary>
         /// 支持talkingdata
@@ -35,8 +45,18 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         public bool enableTalkingData;
 
         /// <summary>
+        /// talkingdata
+        /// </summary>
+        public TalkingData talkingData;
+
+        /// <summary>
         /// 支持聊呗
         /// </summary>
         public bool enableLiaoBe;
+
+        /// <summary>
+        /// 聊呗
+        /// </summary>
+        public LiaoBe liaoBe;
     }
 }

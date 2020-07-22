@@ -84,7 +84,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
 
         private void OnGUI()
         {
-            InitUi();
+            MakeupUi();
         }
 
 
@@ -98,28 +98,78 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         #region 界面方法
 
         /// <summary>
-        /// 初始化ui
+        /// 构建ui
         /// </summary>
-        private void InitUi()
+        private void MakeupUi()
         {
-            InitSdkList();
+            GUILayout.Label("开启Sdk列表", EditorStyles.boldLabel);
+            MakeupWeChatUi();
+            MakeupBaiduMapUi();
+            MakeupTalkingDataUi();
+            MakeupJPushUi();
+            MakeupLiaoBeUi();
         }
 
         /// <summary>
-        /// 初始化sdk列表
+        /// 微信
         /// </summary>
-        private void InitSdkList()
+        private void MakeupWeChatUi()
         {
-            GUILayout.Label("开启Sdk列表", EditorStyles.boldLabel);
             _config.enableWeChat = EditorGUILayout.BeginToggleGroup("微信", _config.enableWeChat);
+            EditorGUI.indentLevel++;
             _config.weChat.appId = EditorGUILayout.TextField("AppId", _config.weChat.appId);
             _config.weChat.ulink = EditorGUILayout.TextField("Ulink", _config.weChat.ulink);
+            EditorGUI.indentLevel--;
             EditorGUILayout.EndToggleGroup();
+        }
 
-            _config.enableBaiduMap = EditorGUILayout.Toggle("百度地图", _config.enableBaiduMap);
-            _config.enableTalkingData = EditorGUILayout.Toggle("TalkingData", _config.enableTalkingData);
-            _config.enableJpush = EditorGUILayout.Toggle("极光推送", _config.enableJpush);
-            _config.enableLiaoBe = EditorGUILayout.Toggle("聊呗", _config.enableLiaoBe);
+        /// <summary>
+        /// 百度地图
+        /// </summary>
+        private void MakeupBaiduMapUi()
+        {
+            _config.enableBaiduMap = EditorGUILayout.BeginToggleGroup("百度地图", _config.enableBaiduMap);
+            EditorGUI.indentLevel++;
+            _config.baiduMap.iosAppId = EditorGUILayout.TextField("Ios AppId", _config.baiduMap.iosAppId);
+            _config.baiduMap.androidAppId = EditorGUILayout.TextField("Android AppId", _config.baiduMap.androidAppId);
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndToggleGroup();
+        }
+
+        /// <summary>
+        /// talkingdata
+        /// </summary>
+        private void MakeupTalkingDataUi()
+        {
+            _config.enableTalkingData = EditorGUILayout.BeginToggleGroup("TalkingData", _config.enableTalkingData);
+            EditorGUI.indentLevel++;
+            _config.talkingData.appId = EditorGUILayout.TextField("AppId", _config.talkingData.appId);
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndToggleGroup();
+        }
+
+        /// <summary>
+        /// 极光推送
+        /// </summary>
+        private void MakeupJPushUi()
+        {
+            _config.enableJpush = EditorGUILayout.BeginToggleGroup("极光推送", _config.enableJpush);
+            EditorGUI.indentLevel++;
+            _config.jPush.appId = EditorGUILayout.TextField("AppId", _config.jPush.appId);
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndToggleGroup();
+        }
+
+        /// <summary>
+        /// 聊呗
+        /// </summary>
+        private void MakeupLiaoBeUi()
+        {
+            _config.enableLiaoBe = EditorGUILayout.BeginToggleGroup("聊呗", _config.enableLiaoBe);
+            EditorGUI.indentLevel++;
+            _config.liaoBe.appId = EditorGUILayout.TextField("AppId", _config.liaoBe.appId);
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndToggleGroup();
         }
 
         #endregion
