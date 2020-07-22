@@ -34,7 +34,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         /// <summary>
         ///     sdk参数配置
         /// </summary>
-        [MenuItem("Tools/SDK配置/SDK管理")]
+        [MenuItem("自定义工具/SDK配置/SDK管理")]
         public static void OpenMainConfigWindow()
         {
             var window = GetWindow<MainWindow>();
@@ -48,7 +48,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         /// <summary>
         ///     sdk参数配置
         /// </summary>
-        [MenuItem("Tools/SDK配置/还原配置文件")]
+        [MenuItem("自定义工具/SDK配置/还原配置文件")]
         public static void ClearSdk()
         {
             CreateConfig();
@@ -111,16 +111,14 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         private void InitSdkList()
         {
             GUILayout.Label("开启Sdk列表", EditorStyles.boldLabel);
-            _config.enableWeChat = EditorGUILayout.Toggle("微信", _config.enableWeChat);
-            if (_config.enableWeChat)
-            {
-                _config.weChat.appId = EditorGUILayout.TextField("AppId", _config.weChat.appId);
-                _config.weChat.ulink = EditorGUILayout.TextField("Ulink", _config.weChat.ulink);
-            }
+            _config.enableWeChat = EditorGUILayout.BeginToggleGroup("微信", _config.enableWeChat);
+            _config.weChat.appId = EditorGUILayout.TextField("AppId", _config.weChat.appId);
+            _config.weChat.ulink = EditorGUILayout.TextField("Ulink", _config.weChat.ulink);
+            EditorGUILayout.EndToggleGroup();
 
             _config.enableBaiduMap = EditorGUILayout.Toggle("百度地图", _config.enableBaiduMap);
-            _config.enableJpush = EditorGUILayout.Toggle("极光推送", _config.enableJpush);
             _config.enableTalkingData = EditorGUILayout.Toggle("TalkingData", _config.enableTalkingData);
+            _config.enableJpush = EditorGUILayout.Toggle("极光推送", _config.enableJpush);
             _config.enableLiaoBe = EditorGUILayout.Toggle("聊呗", _config.enableLiaoBe);
         }
 
