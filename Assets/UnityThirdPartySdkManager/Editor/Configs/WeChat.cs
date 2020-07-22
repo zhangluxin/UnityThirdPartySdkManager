@@ -3,18 +3,18 @@ using System;
 namespace UnityThirdPartySdkManager.Editor.Configs
 {
     /// <summary>
-    /// 微信结构体
+    ///     微信结构体
     /// </summary>
     [Serializable]
     public class WeChat
     {
         /// <summary>
-        /// appid
+        ///     appid
         /// </summary>
         public string appId;
 
         /// <summary>
-        /// ulink
+        ///     ulink
         /// </summary>
         public string ulink;
     }

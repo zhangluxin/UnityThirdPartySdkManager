@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
@@ -13,17 +12,17 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         #region 变量定义
 
         /// <summary>
-        /// 配置文件目录
+        ///     配置文件目录
         /// </summary>
         private static readonly string ConfigFilePath = Path.Combine(Application.persistentDataPath, "Sdks");
 
         /// <summary>
-        /// 配置文件路径
+        ///     配置文件路径
         /// </summary>
         private static readonly string ConfigFile = Path.Combine(ConfigFilePath, "config.json");
 
         /// <summary>
-        /// 配置信息
+        ///     配置信息
         /// </summary>
         private Config _config;
 
@@ -98,7 +97,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         #region 界面方法
 
         /// <summary>
-        /// 构建ui
+        ///     构建ui
         /// </summary>
         private void MakeupUi()
         {
@@ -111,7 +110,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 微信
+        ///     微信
         /// </summary>
         private void MakeupWeChatUi()
         {
@@ -124,7 +123,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 百度地图
+        ///     百度地图
         /// </summary>
         private void MakeupBaiduMapUi()
         {
@@ -137,7 +136,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// talkingdata
+        ///     talkingdata
         /// </summary>
         private void MakeupTalkingDataUi()
         {
@@ -149,7 +148,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 极光推送
+        ///     极光推送
         /// </summary>
         private void MakeupJPushUi()
         {
@@ -161,7 +160,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 聊呗
+        ///     聊呗
         /// </summary>
         private void MakeupLiaoBeUi()
         {
@@ -195,7 +194,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 创建配置文件
+        ///     创建配置文件
         /// </summary>
         private static void CreateConfig()
         {
@@ -211,7 +210,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 保存配置
+        ///     保存配置
         /// </summary>
         private void SaveConfig()
         {

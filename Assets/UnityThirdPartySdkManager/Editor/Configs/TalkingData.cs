@@ -3,13 +3,13 @@ using System;
 namespace UnityThirdPartySdkManager.Editor.Configs
 {
     /// <summary>
-    /// talkingdata
+    ///     talkingdata
     /// </summary>
     [Serializable]
     public class TalkingData
     {
         /// <summary>
-        /// app id
+        ///     app id
         /// </summary>
         public string appId;
     }
