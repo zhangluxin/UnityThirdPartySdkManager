@@ -26,6 +26,16 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         /// </summary>
         private Config _config;
 
+        /// <summary>
+        /// ios配置折叠
+        /// </summary>
+        private bool _showIos;
+
+        /// <summary>
+        /// 安卓配置折叠
+        /// </summary>
+        private bool _showAndroid;
+
         #endregion
 
         #region 功能入口
@@ -107,6 +117,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
             MakeupTalkingDataUi();
             MakeupJPushUi();
             MakeupLiaoBeUi();
+            MakeupIosUi();
         }
 
         /// <summary>
@@ -169,6 +180,20 @@ namespace UnityThirdPartySdkManager.Editor.Windows
             _config.liaoBe.appId = EditorGUILayout.TextField("AppId", _config.liaoBe.appId);
             EditorGUI.indentLevel--;
             EditorGUILayout.EndToggleGroup();
+        }
+
+        /// <summary>
+        /// ios配置
+        /// </summary>
+        private void MakeupIosUi()
+        {
+            _showIos = EditorGUILayout.Foldout(_showIos, "Ios配置");
+            if (!_showIos) return;
+            EditorGUI.indentLevel++;
+            _config.podUrl = EditorGUILayout.TextField("pod地址", _config.podUrl);
+            _config.iosVersion = EditorGUILayout.TextField("最低ios版本", _config.iosVersion);
+            _config.bitCode = EditorGUILayout.Toggle("支持BitCode", _config.bitCode);
+            EditorGUI.indentLevel--;
         }
 
         #endregion

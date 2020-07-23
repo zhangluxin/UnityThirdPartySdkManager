@@ -8,6 +8,8 @@ namespace UnityThirdPartySdkManager.Editor.Configs
     [Serializable]
     public class Config
     {
+        #region 通用配置
+
         /// <summary>
         ///     百度地图
         /// </summary>
@@ -57,5 +59,26 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         ///     微信
         /// </summary>
         public WeChat weChat;
+
+        #endregion
+
+        #region Ios配置
+
+        /// <summary>
+        ///     cocoapods
+        /// </summary>
+        public string podUrl;
+
+        /// <summary>
+        ///     cocoapods最低版本
+        /// </summary>
+        public string iosVersion;
+
+        /// <summary>
+        ///     是否支持bitcode
+        /// </summary>
+        public bool bitCode;
+
+        #endregion
     }
 }
