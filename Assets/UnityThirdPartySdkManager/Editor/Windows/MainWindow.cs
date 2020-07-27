@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityThirdPartySdkManager.Editor.Configs;
+using UnityThirdPartySdkManager.Editor.Generator;
 
 namespace UnityThirdPartySdkManager.Editor.Windows
 {
@@ -29,12 +31,27 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         /// <summary>
         /// ios配置折叠
         /// </summary>
-        private bool _showIos;
+        private bool _showIos = false;
 
         /// <summary>
         /// 安卓配置折叠
         /// </summary>
-        private bool _showAndroid;
+        private bool _showAndroid = false;
+
+        /// <summary>
+        ///  pod列表
+        /// </summary>
+        private ReorderableList _podList;
+
+        /// <summary>
+        ///  scheme列表
+        /// </summary>
+        private ReorderableList _schemeList;
+
+        /// <summary>
+        ///  pod列表
+        /// </summary>
+        private ReorderableList _urlTypeList;
 
         #endregion
 
@@ -47,7 +64,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         public static void OpenMainConfigWindow()
         {
             var window = GetWindow<MainWindow>();
-            window.titleContent = new GUIContent("SDK配置主窗口");
+            window.titleContent = new GUIContent("SDK配置");
             window.Show();
 
 
@@ -71,11 +88,11 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         [PostProcessBuild(999)]
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
-            // var config = ReadConfig();
+            var config = ReadConfig();
             switch (target)
             {
                 case BuildTarget.iOS:
-                    // Ios.Build(pathToBuiltProject, config);
+                    new IosGenerator(pathToBuiltProject, config).Run();
                     break;
                 case BuildTarget.Android:
                     break;
@@ -89,6 +106,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         private void OnEnable()
         {
             _config = ReadConfig();
+            InitList();
         }
 
         private void OnGUI()
@@ -111,13 +129,15 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         /// </summary>
         private void MakeupUi()
         {
-            GUILayout.Label("开启Sdk列表", EditorStyles.boldLabel);
+            GUILayout.Label("Sdk列表", EditorStyles.boldLabel);
             MakeupWeChatUi();
             MakeupBaiduMapUi();
             MakeupTalkingDataUi();
             MakeupJPushUi();
             MakeupLiaoBeUi();
+            GUILayout.Label("______________________________________________________________________");
             MakeupIosUi();
+            GUILayout.Label("______________________________________________________________________");
         }
 
         /// <summary>
@@ -193,7 +213,45 @@ namespace UnityThirdPartySdkManager.Editor.Windows
             _config.podUrl = EditorGUILayout.TextField("pod地址", _config.podUrl);
             _config.iosVersion = EditorGUILayout.TextField("最低ios版本", _config.iosVersion);
             _config.bitCode = EditorGUILayout.Toggle("支持BitCode", _config.bitCode);
+            _config.iosSdkPath = EditorGUILayout.TextField("sdk路径", _config.iosSdkPath);
+            _podList.DoLayoutList();
+            _schemeList.DoLayoutList();
+            _urlTypeList.DoLayoutList();
             EditorGUI.indentLevel--;
+        }
+
+        /// <summary>
+        /// 初始化列表
+        /// </summary>
+        private void InitList()
+        {
+            _podList = new ReorderableList(_config.podList, _config.podList.GetType())
+            {
+                drawHeaderCallback = rect => { GUI.Label(rect, "pod列表"); },
+                drawElementCallback = (rect, index, isActive, isFocused) =>
+                {
+                    _config.podList[index] = EditorGUI.TextField(rect, _config.podList[index]);
+                },
+                onAddCallback = list => { _config.podList.Add(""); }
+            };
+            _schemeList = new ReorderableList(_config.schemes, _config.schemes.GetType())
+            {
+                drawHeaderCallback = rect => { GUI.Label(rect, "scheme列表"); },
+                drawElementCallback = (rect, index, isActive, isFocused) =>
+                {
+                    _config.schemes[index] = EditorGUI.TextField(rect, _config.schemes[index]);
+                },
+                onAddCallback = list => { _config.schemes.Add(""); }
+            };
+            _urlTypeList = new ReorderableList(_config.urlTypes, _config.urlTypes.GetType())
+            {
+                drawHeaderCallback = rect => { GUI.Label(rect, "scheme列表"); },
+                drawElementCallback = (rect, index, isActive, isFocused) =>
+                {
+                    _config.urlTypes[index] = EditorGUI.TextField(rect, _config.urlTypes[index]);
+                },
+                onAddCallback = list => { _config.urlTypes.Add(""); }
+            };
         }
 
         #endregion

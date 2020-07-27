@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace UnityThirdPartySdkManager.Editor.Configs
 {
@@ -75,9 +77,29 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         public string iosVersion;
 
         /// <summary>
+        /// 库列表
+        /// </summary>
+        public List<string> podList;
+
+        /// <summary>
         ///     是否支持bitcode
         /// </summary>
         public bool bitCode;
+
+        /// <summary>
+        /// sdk保存路径
+        /// </summary>
+        public string iosSdkPath = "Sdk/Ios";
+
+        /// <summary>
+        /// scheme列表
+        /// </summary>
+        public List<string> schemes;
+
+        /// <summary>
+        /// urltype列表
+        /// </summary>
+        public List<string> urlTypes;
 
         #endregion
     }
