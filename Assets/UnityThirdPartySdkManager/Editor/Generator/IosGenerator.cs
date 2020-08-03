@@ -47,7 +47,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
                 return;
             }
 
-            if (_config.podList.Count > 0)
+            if (_config.ios.cocoapods.enable)
             {
                 GeneratePodfile();
             }
@@ -55,6 +55,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             ModifyPbxproj();
             ModifyPlist();
         }
+
 
         /// <summary>
         /// 生成pod文件
@@ -69,11 +70,11 @@ namespace UnityThirdPartySdkManager.Editor.Generator
 
             var streamWriter = new StreamWriter(podfilePath);
             var allstr = new StringBuilder();
-            allstr.Append($"source '{_config.podUrl}'\n");
-            allstr.Append($"platform :ios, '{_config.iosVersion}'\n");
+            allstr.Append($"source '{_config.ios.cocoapods.podUrl}'\n");
+            allstr.Append($"platform :ios, '{_config.ios.cocoapods.podIosVersion}'\n");
             allstr.Append("\n");
             allstr.Append("target 'UnityFramework' do\n");
-            foreach (var pod in _config.podList)
+            foreach (var pod in _config.ios.cocoapods.podList)
             {
                 allstr.Append($"pod '{pod}'\n");
             }
@@ -109,9 +110,9 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             var pbxProject = new PBXProject();
             pbxProject.ReadFromFile(pbxprojPath);
             var target = pbxProject.TargetGuidByName("UnityFramework");
-            if (!string.IsNullOrEmpty(_config.iosSdkPath))
-                AddSdkFiles(pbxProject, target, _config.iosSdkPath);
-            if (!_config.bitCode)
+            if (!string.IsNullOrEmpty(_config.ios.sdkPath))
+                AddSdkFiles(pbxProject, target, _config.ios.sdkPath);
+            if (!_config.ios.bitCode)
                 CloseBitCode(pbxProject, target);
             pbxProject.WriteToFile(pbxprojPath);
         }
@@ -159,6 +160,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             pbxProject.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
         }
 
+
         /// <summary>
         /// 修改plist
         /// </summary>
@@ -167,13 +169,13 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             var plistPath = Path.Combine(_pathToBuiltProject, "Info.plist");
             var plistDocument = new PlistDocument();
             plistDocument.ReadFromFile(plistPath);
-            if (_config.schemes.Count > 0)
-                AddSchemes(plistDocument, _config.schemes);
-            if (_config.urlTypes.Count > 0)
-                AddUrlTypes(plistDocument, _config.urlTypes);
+            if (_config.ios.schemes.Count > 0)
+                AddSchemes(plistDocument, _config.ios.schemes);
+            if (_config.ios.urlTypes.Count > 0)
+                AddUrlTypes(plistDocument, _config.ios.urlTypes);
             plistDocument.WriteToFile(plistPath);
         }
-        
+
         /// <summary>
         /// 添加Application Queries Schemes
         /// </summary>
@@ -181,7 +183,6 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// <param name="schemes">schemes</param>
         private static void AddSchemes(PlistDocument plistDocument, IEnumerable<string> schemes)
         {
-            // todo
             if (!plistDocument.root.values.ContainsKey("LSApplicationQueriesSchemes"))
             {
                 plistDocument.root.CreateArray("LSApplicationQueriesSchemes");
@@ -190,8 +191,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             var queriesSchemes = plistDocument.root["LSApplicationQueriesSchemes"].AsArray();
             foreach (var scheme in schemes)
             {
-                var isExist = queriesSchemes.values.Any(element => element.AsString() == scheme);
-                if (!isExist)
+                if (queriesSchemes.values.All(element => element.AsString() != scheme))
                 {
                     queriesSchemes.AddString(scheme);
                 }
@@ -203,28 +203,27 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// </summary>
         /// <param name="plistDocument">plist</param>
         /// <param name="urlTypes">urlTypes</param>
-        private static void AddUrlTypes(PlistDocument plistDocument, List<string> urlTypes)
+        private static void AddUrlTypes(PlistDocument plistDocument, List<UrlType> urlTypes)
         {
-            // todo
-            // if (!plistDocument.root.values.ContainsKey("CFBundleURLTypes"))
-            // {
-            //     plistDocument.root.CreateArray("CFBundleURLTypes");
-            // }
-            //
-            // foreach (var urlType in urlTypes)
-            // {
-            //     if (char.IsDigit(urlType.Value[0]))
-            //     {
-            //         Debug.LogError("urlType不能以数字开头");
-            //         continue;
-            //     }
-            //
-            //     var typeDic = plistDocument.root["CFBundleURLTypes"].AsArray().AddDict();
-            //     typeDic.SetString("CFBundleTypeRole", "Editor");
-            //     typeDic.SetString("CFBundleURLName", urlType.Key);
-            //     typeDic.CreateArray("CFBundleURLSchemes");
-            //     typeDic["CFBundleURLSchemes"].AsArray().AddString(urlType.Value);
-            // }
+            if (!plistDocument.root.values.ContainsKey("CFBundleURLTypes"))
+            {
+                plistDocument.root.CreateArray("CFBundleURLTypes");
+            }
+
+            foreach (var urlType in urlTypes)
+            {
+                if (char.IsDigit(urlType.urlScheme[0]))
+                {
+                    Debug.LogError("urlType不能以数字开头");
+                    continue;
+                }
+
+                var typeDic = plistDocument.root["CFBundleURLTypes"].AsArray().AddDict();
+                typeDic.SetString("CFBundleTypeRole", "Editor");
+                typeDic.SetString("CFBundleURLName", urlType.id);
+                typeDic.CreateArray("CFBundleURLSchemes");
+                typeDic["CFBundleURLSchemes"].AsArray().AddString(urlType.urlScheme);
+            }
         }
     }
 }

@@ -3,19 +3,19 @@ using System;
 namespace UnityThirdPartySdkManager.Editor.Configs
 {
     /// <summary>
-    ///     微信结构体
+    /// UrlType结构体
     /// </summary>
     [Serializable]
-    public class WeChat
+    public class UrlType
     {
         /// <summary>
-        ///     appid
+        /// id
         /// </summary>
-        public string appId;
+        public string id;
 
         /// <summary>
-        ///     ulink
+        /// scheme
         /// </summary>
-        public string ulink;
+        public string urlScheme;
     }
 }
