@@ -29,16 +29,6 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         private Config _config;
 
         /// <summary>
-        /// ios配置折叠
-        /// </summary>
-        private bool _showIos = false;
-
-        /// <summary>
-        /// 安卓配置折叠
-        /// </summary>
-        private bool _showAndroid = false;
-
-        /// <summary>
         ///  pod列表
         /// </summary>
         private ReorderableList _podList;
@@ -52,6 +42,11 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         ///  pod列表
         /// </summary>
         private ReorderableList _urlTypeList;
+
+        /// <summary>
+        /// 标签页位置（0为ios，1为安卓）
+        /// </summary>
+        private int _selectedToolBarId;
 
         #endregion
 
@@ -106,7 +101,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         private void OnEnable()
         {
             _config = ReadConfig();
-            InitList();
+            InitAllList();
         }
 
         private void OnGUI()
@@ -130,129 +125,128 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         private void MakeupUi()
         {
             GUILayout.Label("Sdk列表", EditorStyles.boldLabel);
-            MakeupWeChatUi();
-            MakeupBaiduMapUi();
-            MakeupTalkingDataUi();
-            MakeupJPushUi();
-            MakeupLiaoBeUi();
+            _selectedToolBarId = GUILayout.Toolbar(_selectedToolBarId, new[] {"Ios", "Android"});
             GUILayout.Label("______________________________________________________________________");
-            MakeupIosUi();
-            GUILayout.Label("______________________________________________________________________");
+            switch (_selectedToolBarId)
+            {
+                case 0:
+                    MakeupIosUi();
+                    break;
+                case 1:
+                    MakeupAndroidUi();
+                    break;
+            }
         }
 
         /// <summary>
-        ///     微信
+        /// 初始化所有List
         /// </summary>
-        private void MakeupWeChatUi()
+        private void InitAllList()
         {
-            _config.enableWeChat = EditorGUILayout.BeginToggleGroup("微信", _config.enableWeChat);
-            EditorGUI.indentLevel++;
-            _config.weChat.appId = EditorGUILayout.TextField("AppId", _config.weChat.appId);
-            _config.weChat.ulink = EditorGUILayout.TextField("Ulink", _config.weChat.ulink);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.EndToggleGroup();
+            InitPodList();
+            InitSchemeList();
+            InitUrlTypeList();
         }
 
-        /// <summary>
-        ///     百度地图
-        /// </summary>
-        private void MakeupBaiduMapUi()
-        {
-            _config.enableBaiduMap = EditorGUILayout.BeginToggleGroup("百度地图", _config.enableBaiduMap);
-            EditorGUI.indentLevel++;
-            _config.baiduMap.iosAppId = EditorGUILayout.TextField("Ios AppId", _config.baiduMap.iosAppId);
-            _config.baiduMap.androidAppId = EditorGUILayout.TextField("Android AppId", _config.baiduMap.androidAppId);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.EndToggleGroup();
-        }
+        #region Ios界面
 
         /// <summary>
-        ///     talkingdata
+        /// 初始化pod列表
         /// </summary>
-        private void MakeupTalkingDataUi()
+        private void InitPodList()
         {
-            _config.enableTalkingData = EditorGUILayout.BeginToggleGroup("TalkingData", _config.enableTalkingData);
-            EditorGUI.indentLevel++;
-            _config.talkingData.appId = EditorGUILayout.TextField("AppId", _config.talkingData.appId);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.EndToggleGroup();
-        }
-
-        /// <summary>
-        ///     极光推送
-        /// </summary>
-        private void MakeupJPushUi()
-        {
-            _config.enableJpush = EditorGUILayout.BeginToggleGroup("极光推送", _config.enableJpush);
-            EditorGUI.indentLevel++;
-            _config.jPush.appId = EditorGUILayout.TextField("AppId", _config.jPush.appId);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.EndToggleGroup();
-        }
-
-        /// <summary>
-        ///     聊呗
-        /// </summary>
-        private void MakeupLiaoBeUi()
-        {
-            _config.enableLiaoBe = EditorGUILayout.BeginToggleGroup("聊呗", _config.enableLiaoBe);
-            EditorGUI.indentLevel++;
-            _config.liaoBe.appId = EditorGUILayout.TextField("AppId", _config.liaoBe.appId);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.EndToggleGroup();
-        }
-
-        /// <summary>
-        /// ios配置
-        /// </summary>
-        private void MakeupIosUi()
-        {
-            _showIos = EditorGUILayout.Foldout(_showIos, "Ios配置");
-            if (!_showIos) return;
-            EditorGUI.indentLevel++;
-            _config.podUrl = EditorGUILayout.TextField("pod地址", _config.podUrl);
-            _config.iosVersion = EditorGUILayout.TextField("最低ios版本", _config.iosVersion);
-            _config.bitCode = EditorGUILayout.Toggle("支持BitCode", _config.bitCode);
-            _config.iosSdkPath = EditorGUILayout.TextField("sdk路径", _config.iosSdkPath);
-            _podList.DoLayoutList();
-            _schemeList.DoLayoutList();
-            _urlTypeList.DoLayoutList();
-            EditorGUI.indentLevel--;
-        }
-
-        /// <summary>
-        /// 初始化列表
-        /// </summary>
-        private void InitList()
-        {
-            _podList = new ReorderableList(_config.podList, _config.podList.GetType())
+            _podList = new ReorderableList(_config.ios.cocoapods.podList, _config.ios.cocoapods.podList.GetType())
             {
                 drawHeaderCallback = rect => { GUI.Label(rect, "pod列表"); },
                 drawElementCallback = (rect, index, isActive, isFocused) =>
                 {
-                    _config.podList[index] = EditorGUI.TextField(rect, _config.podList[index]);
+                    _config.ios.cocoapods.podList[index] =
+                        EditorGUI.TextField(rect, _config.ios.cocoapods.podList[index]);
                 },
-                onAddCallback = list => { _config.podList.Add(""); }
-            };
-            _schemeList = new ReorderableList(_config.schemes, _config.schemes.GetType())
-            {
-                drawHeaderCallback = rect => { GUI.Label(rect, "scheme列表"); },
-                drawElementCallback = (rect, index, isActive, isFocused) =>
-                {
-                    _config.schemes[index] = EditorGUI.TextField(rect, _config.schemes[index]);
-                },
-                onAddCallback = list => { _config.schemes.Add(""); }
-            };
-            _urlTypeList = new ReorderableList(_config.urlTypes, _config.urlTypes.GetType())
-            {
-                drawHeaderCallback = rect => { GUI.Label(rect, "scheme列表"); },
-                drawElementCallback = (rect, index, isActive, isFocused) =>
-                {
-                    _config.urlTypes[index] = EditorGUI.TextField(rect, _config.urlTypes[index]);
-                },
-                onAddCallback = list => { _config.urlTypes.Add(""); }
+                onAddCallback = list => { _config.ios.cocoapods.podList.Add(""); }
             };
         }
+
+        /// <summary>
+        /// 初始化scheme列表
+        /// </summary>
+        private void InitSchemeList()
+        {
+            _schemeList = new ReorderableList(_config.ios.schemes, _config.ios.schemes.GetType())
+            {
+                drawHeaderCallback = rect => { GUI.Label(rect, "scheme列表"); },
+                drawElementCallback = (rect, index, isActive, isFocused) =>
+                {
+                    _config.ios.schemes[index] = EditorGUI.TextField(rect, _config.ios.schemes[index]);
+                },
+                onAddCallback = list => { _config.ios.schemes.Add(""); }
+            };
+        }
+
+        /// <summary>
+        /// 初始化urlType列表
+        /// </summary>
+        private void InitUrlTypeList()
+        {
+            _urlTypeList = new ReorderableList(_config.ios.urlTypes, _config.ios.urlTypes.GetType())
+            {
+                drawHeaderCallback = rect => { GUI.Label(rect, "urlType列表"); },
+                drawElementCallback = (rect, index, isActive, isFocused) =>
+                {
+                    var rect1 = new Rect(rect.x, rect.y, rect.width / 2, rect.height);
+                    var rect2 = new Rect(rect.x + rect.width / 2, rect.y, rect.width / 2, rect.height);
+                    _config.ios.urlTypes[index].id = EditorGUI.TextField(rect1, _config.ios.urlTypes[index].id);
+                    _config.ios.urlTypes[index].urlScheme =
+                        EditorGUI.TextField(rect2, _config.ios.urlTypes[index].urlScheme);
+                },
+                onAddCallback = list => { _config.ios.urlTypes.Add(new UrlType()); }
+            };
+        }
+
+        /// <summary>
+        /// ios 配置
+        /// </summary>
+        private void MakeupIosUi()
+        {
+            MakeupPodUi();
+            _schemeList.DoLayoutList();
+            _urlTypeList.DoLayoutList();
+            _config.ios.bitCode = EditorGUILayout.Toggle("支持BitCode", _config.ios.bitCode);
+        }
+
+        /// <summary>
+        /// android 配置
+        /// </summary>
+        private void MakeupAndroidUi()
+        {
+        }
+
+        /// <summary>
+        /// pod列表
+        /// </summary>
+        private void MakeupPodUi()
+        {
+            _config.ios.cocoapods.enable =
+                EditorGUILayout.BeginToggleGroup("开启CocoaPods", _config.ios.cocoapods.enable);
+            EditorGUILayout.Foldout(_config.ios.cocoapods.enable, "CocoaPods配置");
+            EditorGUI.indentLevel++;
+            if (_config.ios.cocoapods.enable)
+            {
+                _config.ios.cocoapods.podUrl = EditorGUILayout.TextField("pod地址", _config.ios.cocoapods.podUrl);
+                _config.ios.cocoapods.podIosVersion =
+                    EditorGUILayout.TextField("ios版本", _config.ios.cocoapods.podIosVersion);
+                _podList.DoLayoutList();
+            }
+
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndToggleGroup();
+        }
+
+        #endregion
+
+        #region Android界面
+
+        #endregion
 
         #endregion
 
