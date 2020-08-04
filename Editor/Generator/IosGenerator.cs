@@ -11,22 +11,22 @@ using Debug = UnityEngine.Debug;
 namespace UnityThirdPartySdkManager.Editor.Generator
 {
     /// <summary>
-    /// ios生成器
+    ///     ios生成器
     /// </summary>
     public class IosGenerator
     {
         /// <summary>
-        /// 配置
+        ///     配置
         /// </summary>
         private readonly Config _config;
 
         /// <summary>
-        /// 项目路径
+        ///     项目路径
         /// </summary>
         private readonly string _pathToBuiltProject;
 
         /// <summary>
-        /// 构造
+        ///     构造
         /// </summary>
         /// <param name="pathToBuiltProject">项目路径</param>
         /// <param name="config">配置</param>
@@ -37,7 +37,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         }
 
         /// <summary>
-        /// 生成
+        ///     生成
         /// </summary>
         public void Run()
         {
@@ -47,10 +47,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
                 return;
             }
 
-            if (_config.ios.cocoapods.enable)
-            {
-                GeneratePodfile();
-            }
+            if (_config.ios.cocoapods.enable) GeneratePodfile();
 
             ModifyPbxproj();
             ModifyPlist();
@@ -58,15 +55,12 @@ namespace UnityThirdPartySdkManager.Editor.Generator
 
 
         /// <summary>
-        /// 生成pod文件
+        ///     生成pod文件
         /// </summary>
         private void GeneratePodfile()
         {
             var podfilePath = Path.Combine(_pathToBuiltProject, "Podfile");
-            if (File.Exists(podfilePath))
-            {
-                File.Delete(podfilePath);
-            }
+            if (File.Exists(podfilePath)) File.Delete(podfilePath);
 
             var streamWriter = new StreamWriter(podfilePath);
             var allstr = new StringBuilder();
@@ -74,10 +68,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             allstr.Append($"platform :ios, '{_config.ios.cocoapods.podIosVersion}'\n");
             allstr.Append("\n");
             allstr.Append("target 'UnityFramework' do\n");
-            foreach (var pod in _config.ios.cocoapods.podList)
-            {
-                allstr.Append($"pod '{pod}'\n");
-            }
+            foreach (var pod in _config.ios.cocoapods.podList) allstr.Append($"pod '{pod}'\n");
 
             allstr.Append("end\n");
             streamWriter.Write(allstr);
@@ -102,7 +93,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         }
 
         /// <summary>
-        /// 修改pbxproj文件
+        ///     修改pbxproj文件
         /// </summary>
         private void ModifyPbxproj()
         {
@@ -122,7 +113,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         }
 
         /// <summary>
-        /// 添加sdk文件
+        ///     添加sdk文件
         /// </summary>
         /// <param name="pbxProject">打包工程路径</param>
         /// <param name="target">配置的target("默认为UnityFramework")</param>
@@ -136,7 +127,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         }
 
         /// <summary>
-        /// 添加文件
+        ///     添加文件
         /// </summary>
         /// <param name="directory">目录</param>
         /// <param name="pbxProject">打包工程</param>
@@ -151,13 +142,11 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             }
 
             foreach (var directoryInfo in directory.GetDirectories())
-            {
                 AddFiles(directoryInfo, pbxProject, target, $"{path}/{directoryInfo.Name}");
-            }
         }
 
         /// <summary>
-        /// 关掉bitcode
+        ///     关掉bitcode
         /// </summary>
         private static void CloseBitCode(PBXProject pbxProject, string target)
         {
@@ -166,7 +155,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
 
 
         /// <summary>
-        /// 修改plist
+        ///     修改plist
         /// </summary>
         private void ModifyPlist()
         {
@@ -181,56 +170,44 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         }
 
         /// <summary>
-        /// 添加Capability
+        ///     添加Capability
         /// </summary>
         private void AddCapability(ProjectCapabilityManager capManager)
         {
             var arr = _config.ios.associatedDomains.ToArray();
             for (var i = 0; i < arr.Length; i++)
-            {
                 if (!arr[i].StartsWith("applinks:"))
-                {
                     arr[i] = $"applinks:{arr[i]}";
-                }
-            }
 
             capManager.AddAssociatedDomains(arr);
             capManager.WriteToFile();
         }
 
         /// <summary>
-        /// 添加Application Queries Schemes
+        ///     添加Application Queries Schemes
         /// </summary>
         /// <param name="plistDocument">plist</param>
         /// <param name="schemes">schemes</param>
         private static void AddSchemes(PlistDocument plistDocument, IEnumerable<string> schemes)
         {
             if (!plistDocument.root.values.ContainsKey("LSApplicationQueriesSchemes"))
-            {
                 plistDocument.root.CreateArray("LSApplicationQueriesSchemes");
-            }
 
             var queriesSchemes = plistDocument.root["LSApplicationQueriesSchemes"].AsArray();
             foreach (var scheme in schemes)
-            {
                 if (queriesSchemes.values.All(element => element.AsString() != scheme))
-                {
                     queriesSchemes.AddString(scheme);
-                }
-            }
         }
 
         /// <summary>
-        /// 添加Url Type
+        ///     添加Url Type
         /// </summary>
         /// <param name="plistDocument">plist</param>
         /// <param name="urlTypes">urlTypes</param>
         private static void AddUrlTypes(PlistDocument plistDocument, List<UrlType> urlTypes)
         {
             if (!plistDocument.root.values.ContainsKey("CFBundleURLTypes"))
-            {
                 plistDocument.root.CreateArray("CFBundleURLTypes");
-            }
 
             foreach (var urlType in urlTypes)
             {

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace UnityThirdPartySdkManager.Editor.Configs
 {
@@ -11,7 +9,7 @@ namespace UnityThirdPartySdkManager.Editor.Configs
     public class Config
     {
         /// <summary>
-        /// ios配置
+        ///     ios配置
         /// </summary>
         public IosConfig ios;
     }
