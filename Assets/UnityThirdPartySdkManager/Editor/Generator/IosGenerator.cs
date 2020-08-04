@@ -87,7 +87,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
                 StartInfo =
                 {
                     FileName = "/usr/local/bin/pod",
-                    Arguments = $"install --project-directory=${_pathToBuiltProject}",
+                    Arguments = $"install --project-directory={_pathToBuiltProject}",
                     UseShellExecute = false,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     CreateNoWindow = true,
@@ -106,14 +106,18 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// </summary>
         private void ModifyPbxproj()
         {
-            var pbxprojPath = Path.Combine(_pathToBuiltProject, "Unity-iPhone.xcodeproj", "project.pbxproj");
+            var pbxprojPath = PBXProject.GetPBXProjectPath(_pathToBuiltProject);
             var pbxProject = new PBXProject();
             pbxProject.ReadFromFile(pbxprojPath);
-            var target = pbxProject.TargetGuidByName("UnityFramework");
+            var frameworkTarget = pbxProject.GetUnityFrameworkTargetGuid();
             if (!string.IsNullOrEmpty(_config.ios.sdkPath))
-                AddSdkFiles(pbxProject, target, _config.ios.sdkPath);
+                AddSdkFiles(pbxProject, frameworkTarget, _config.ios.sdkPath);
             if (!_config.ios.bitCode)
-                CloseBitCode(pbxProject, target);
+                CloseBitCode(pbxProject, frameworkTarget);
+            var prejectTarget = pbxProject.GetUnityMainTargetGuid();
+            pbxProject.AddCapability(prejectTarget, PBXCapabilityType.InAppPurchase, "ios.entitlements");
+            var capManager = new ProjectCapabilityManager(pbxprojPath, "ios.entitlements", null, prejectTarget);
+            AddCapability(capManager);
             pbxProject.WriteToFile(pbxprojPath);
         }
 
@@ -174,6 +178,24 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             if (_config.ios.urlTypes.Count > 0)
                 AddUrlTypes(plistDocument, _config.ios.urlTypes);
             plistDocument.WriteToFile(plistPath);
+        }
+
+        /// <summary>
+        /// 添加Capability
+        /// </summary>
+        private void AddCapability(ProjectCapabilityManager capManager)
+        {
+            var arr = _config.ios.associatedDomains.ToArray();
+            for (var i = 0; i < arr.Length; i++)
+            {
+                if (!arr[i].StartsWith("applinks:"))
+                {
+                    arr[i] = $"applinks:{arr[i]}";
+                }
+            }
+
+            capManager.AddAssociatedDomains(arr);
+            capManager.WriteToFile();
         }
 
         /// <summary>
