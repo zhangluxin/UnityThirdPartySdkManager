@@ -29,27 +29,27 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         private Config _config;
 
         /// <summary>
-        ///  pod列表
+        ///     pod列表
         /// </summary>
         private ReorderableList _podList;
 
         /// <summary>
-        ///  scheme列表
+        ///     scheme列表
         /// </summary>
         private ReorderableList _schemeList;
 
         /// <summary>
-        ///  pod列表
+        ///     pod列表
         /// </summary>
         private ReorderableList _urlTypeList;
 
         /// <summary>
-        /// 跳转地址列表
+        ///     跳转地址列表
         /// </summary>
         private ReorderableList _associatedDomainsList;
 
         /// <summary>
-        /// 标签页位置（0为ios，1为安卓）
+        ///     标签页位置（0为ios，1为安卓）
         /// </summary>
         private int _selectedToolBarId;
 
@@ -144,7 +144,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 初始化所有List
+        ///     初始化所有List
         /// </summary>
         private void InitAllList()
         {
@@ -157,7 +157,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         #region Ios界面
 
         /// <summary>
-        /// 初始化pod列表
+        ///     初始化pod列表
         /// </summary>
         private void InitPodList()
         {
@@ -174,7 +174,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 初始化scheme列表
+        ///     初始化scheme列表
         /// </summary>
         private void InitSchemeList()
         {
@@ -190,7 +190,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 初始化urlType列表
+        ///     初始化urlType列表
         /// </summary>
         private void InitUrlTypeList()
         {
@@ -210,7 +210,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// 初始化跳转连接列表
+        ///     初始化跳转连接列表
         /// </summary>
         private void InitAssociatedDomainsList()
         {
@@ -228,7 +228,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// ios 配置
+        ///     ios 配置
         /// </summary>
         private void MakeupIosUi()
         {
@@ -240,14 +240,14 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
-        /// android 配置
+        ///     android 配置
         /// </summary>
         private void MakeupAndroidUi()
         {
         }
 
         /// <summary>
-        /// pod列表
+        ///     pod列表
         /// </summary>
         private void MakeupPodUi()
         {

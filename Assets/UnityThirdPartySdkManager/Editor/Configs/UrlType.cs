@@ -3,18 +3,18 @@ using System;
 namespace UnityThirdPartySdkManager.Editor.Configs
 {
     /// <summary>
-    /// UrlType结构体
+    ///     UrlType结构体
     /// </summary>
     [Serializable]
     public class UrlType
     {
         /// <summary>
-        /// id
+        ///     id
         /// </summary>
         public string id;
 
         /// <summary>
-        /// scheme
+        ///     scheme
         /// </summary>
         public string urlScheme;
     }
