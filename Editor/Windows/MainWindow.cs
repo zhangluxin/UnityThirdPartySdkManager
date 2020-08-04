@@ -44,6 +44,11 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         private ReorderableList _urlTypeList;
 
         /// <summary>
+        /// 跳转地址列表
+        /// </summary>
+        private ReorderableList _associatedDomainsList;
+
+        /// <summary>
         /// 标签页位置（0为ios，1为安卓）
         /// </summary>
         private int _selectedToolBarId;
@@ -146,6 +151,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
             InitPodList();
             InitSchemeList();
             InitUrlTypeList();
+            InitAssociatedDomainsList();
         }
 
         #region Ios界面
@@ -204,6 +210,24 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         }
 
         /// <summary>
+        /// 初始化跳转连接列表
+        /// </summary>
+        private void InitAssociatedDomainsList()
+        {
+            _associatedDomainsList =
+                new ReorderableList(_config.ios.associatedDomains, _config.ios.associatedDomains.GetType())
+                {
+                    drawHeaderCallback = rect => { GUI.Label(rect, "跳转链接列表"); },
+                    drawElementCallback = (rect, index, isActive, isFocused) =>
+                    {
+                        _config.ios.associatedDomains[index] =
+                            EditorGUI.TextField(rect, _config.ios.associatedDomains[index]);
+                    },
+                    onAddCallback = list => { _config.ios.associatedDomains.Add(""); }
+                };
+        }
+
+        /// <summary>
         /// ios 配置
         /// </summary>
         private void MakeupIosUi()
@@ -211,6 +235,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
             MakeupPodUi();
             _schemeList.DoLayoutList();
             _urlTypeList.DoLayoutList();
+            _associatedDomainsList.DoLayoutList();
             _config.ios.bitCode = EditorGUILayout.Toggle("支持BitCode", _config.ios.bitCode);
         }
 

@@ -26,6 +26,11 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         public List<UrlType> urlTypes;
 
         /// <summary>
+        /// 跳转链接
+        /// </summary>
+        public List<string> associatedDomains;
+        
+        /// <summary>
         /// 是否开启bitcode
         /// </summary>
         public bool bitCode;
