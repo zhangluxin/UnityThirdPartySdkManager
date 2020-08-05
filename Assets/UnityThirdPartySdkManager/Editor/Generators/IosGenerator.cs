@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityThirdPartySdkManager.Editor.Configs;
 using Debug = UnityEngine.Debug;
 
-namespace UnityThirdPartySdkManager.Editor.Generator
+namespace UnityThirdPartySdkManager.Editor.Generators
 {
     /// <summary>
     ///     ios生成器
@@ -30,7 +30,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
                 return;
             }
 
-            if (Config.ios.cocoapods.enable) GeneratePodfile();
+            if (Config.ios.pod.enable) GeneratePodfile();
 
             ModifyPbxproj();
             ModifyPlist();
@@ -47,11 +47,11 @@ namespace UnityThirdPartySdkManager.Editor.Generator
 
             var streamWriter = new StreamWriter(podfilePath);
             var allstr = new StringBuilder();
-            allstr.Append($"source '{Config.ios.cocoapods.podUrl}'\n");
-            allstr.Append($"platform :ios, '{Config.ios.cocoapods.podIosVersion}'\n");
+            allstr.Append($"source '{Config.ios.pod.podUrl}'\n");
+            allstr.Append($"platform :ios, '{Config.ios.pod.podIosVersion}'\n");
             allstr.Append("\n");
             allstr.Append("target 'UnityFramework' do\n");
-            foreach (var pod in Config.ios.cocoapods.podList) allstr.Append($"pod '{pod}'\n");
+            foreach (var pod in GeneratePodList()) allstr.Append($"pod '{pod}'\n");
 
             allstr.Append("end\n");
             streamWriter.Write(allstr);
@@ -76,6 +76,21 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         }
 
         /// <summary>
+        /// 生成pod列表
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<string> GeneratePodList()
+        {
+            var list = new List<string>();
+            if (Config.weChat.enable)
+            {
+                list.Add(Config.weChat.pod);
+            }
+
+            return list;
+        }
+
+        /// <summary>
         ///     修改pbxproj文件
         /// </summary>
         private void ModifyPbxproj()
@@ -84,8 +99,8 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             var pbxProject = new PBXProject();
             pbxProject.ReadFromFile(pbxprojPath);
             var frameworkTarget = pbxProject.GetUnityFrameworkTargetGuid();
-            if (!string.IsNullOrEmpty(Config.ios.sdkPath))
-                AddSdkFiles(pbxProject, frameworkTarget, Config.ios.sdkPath);
+            // if (!string.IsNullOrEmpty(Config.ios.sdkPath))
+            //     AddSdkFiles(pbxProject, frameworkTarget, Config.ios.sdkPath);
             if (!Config.ios.bitCode)
                 CloseBitCode(pbxProject, frameworkTarget);
             var prejectTarget = pbxProject.GetUnityMainTargetGuid();
@@ -136,7 +151,6 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             pbxProject.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
         }
 
-
         /// <summary>
         ///     修改plist
         /// </summary>
@@ -145,11 +159,45 @@ namespace UnityThirdPartySdkManager.Editor.Generator
             var plistPath = Path.Combine(PathToBuiltProject, "Info.plist");
             var plistDocument = new PlistDocument();
             plistDocument.ReadFromFile(plistPath);
-            if (Config.ios.schemes.Count > 0)
-                AddSchemes(plistDocument, Config.ios.schemes);
-            if (Config.ios.urlTypes.Count > 0)
-                AddUrlTypes(plistDocument, Config.ios.urlTypes);
+            var schemes = GenerateSchemeList();
+            if (schemes.Count > 0)
+                AddSchemes(plistDocument, schemes);
+            var urlTypes = GenerateUrlTypes();
+            if (urlTypes.Count > 0)
+                AddUrlTypes(plistDocument, urlTypes);
             plistDocument.WriteToFile(plistPath);
+        }
+
+        /// <summary>
+        /// 生成scheme列表
+        /// </summary>
+        /// <returns></returns>
+        private List<string> GenerateSchemeList()
+        {
+            var list = new List<string>();
+            if (Config.weChat.enable)
+            {
+                list.AddRange(Config.weChat.schemes);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// 生成urlType列表
+        /// </summary>
+        /// <returns></returns>
+        private List<UrlType> GenerateUrlTypes()
+        {
+            var list = new List<UrlType>();
+            list.AddRange(Config.ios.urlTypes);
+            if (Config.weChat.enable)
+            {
+                var urltype = new UrlType {id = "wexin", urlScheme = Config.weChat.appId};
+                list.Add(urltype);
+            }
+
+            return list;
         }
 
         /// <summary>
@@ -157,13 +205,28 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// </summary>
         private void AddCapability(ProjectCapabilityManager capManager)
         {
-            var arr = Config.ios.associatedDomains.ToArray();
+            var arr = GenerateAssociatedDomainList().ToArray();
             for (var i = 0; i < arr.Length; i++)
                 if (!arr[i].StartsWith("applinks:"))
                     arr[i] = $"applinks:{arr[i]}";
 
             capManager.AddAssociatedDomains(arr);
             capManager.WriteToFile();
+        }
+
+        /// <summary>
+        /// 生成跳转链接列表
+        /// </summary>
+        /// <returns></returns>
+        private List<string> GenerateAssociatedDomainList()
+        {
+            var list = new List<string>();
+            if (Config.weChat.enable)
+            {
+                list.AddRange(Config.weChat.associatedDomains);
+            }
+
+            return list;
         }
 
         /// <summary>

@@ -1,9 +1,9 @@
 using UnityThirdPartySdkManager.Editor.Configs;
 
-namespace UnityThirdPartySdkManager.Editor.Generator
+namespace UnityThirdPartySdkManager.Editor.Generators
 {
     /// <summary>
-    ///     生成器基类
+    /// 生成器基类
     /// </summary>
     public abstract class Generator
     {
@@ -33,6 +33,6 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// </summary>
         public virtual void Run()
         {
-        }
+        } 
     }
 }

@@ -2,10 +2,9 @@ using System;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityThirdPartySdkManager.Editor.Configs;
-using UnityThirdPartySdkManager.Editor.Generator;
+using UnityThirdPartySdkManager.Editor.Generators;
 
 namespace UnityThirdPartySdkManager.Editor.Windows
 {
@@ -28,36 +27,6 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         /// </summary>
         private Config _config;
 
-        /// <summary>
-        ///     pod列表
-        /// </summary>
-        private ReorderableList _podList;
-
-        /// <summary>
-        ///     scheme列表
-        /// </summary>
-        private ReorderableList _schemeList;
-
-        /// <summary>
-        ///     pod列表
-        /// </summary>
-        private ReorderableList _urlTypeList;
-
-        /// <summary>
-        ///     跳转地址列表
-        /// </summary>
-        private ReorderableList _associatedDomainsList;
-
-        /// <summary>
-        ///     android gradle sdk 列表
-        /// </summary>
-        private ReorderableList _dependList;
-
-        /// <summary>
-        ///     标签页位置（0为ios，1为安卓）
-        /// </summary>
-        private int _selectedToolBarId;
-
         #endregion
 
         #region 功能入口
@@ -66,14 +35,11 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         ///     sdk参数配置
         /// </summary>
         [MenuItem("自定义工具/SDK配置/SDK管理")]
-        public static void OpenMainConfigWindow()
+        private static void ShowWindow()
         {
             var window = GetWindow<MainWindow>();
             window.titleContent = new GUIContent("SDK配置");
             window.Show();
-
-
-            Debug.Log(JsonUtility.ToJson(ReadConfig()));
         }
 
         /// <summary>
@@ -94,7 +60,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
             var config = ReadConfig();
-            Generator.Generator generator;
+            Generator generator;
             switch (target)
             {
                 case BuildTarget.iOS:
@@ -110,20 +76,20 @@ namespace UnityThirdPartySdkManager.Editor.Windows
 
             generator.Run();
         }
-
+        
         #endregion
-
+        
         #region 生命周期
 
         private void OnEnable()
         {
             _config = ReadConfig();
-            InitAllList();
+            // InitAllList();
         }
 
         private void OnGUI()
         {
-            MakeupUi();
+            GenerateUi();
         }
 
 
@@ -137,153 +103,26 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         #region 界面方法
 
         /// <summary>
-        ///     构建ui
+        /// 生成ui
         /// </summary>
-        private void MakeupUi()
+        private void GenerateUi()
         {
             GUILayout.Label("Sdk列表", EditorStyles.boldLabel);
-            _selectedToolBarId = GUILayout.Toolbar(_selectedToolBarId, new[] {"Ios", "Android"});
-            GUILayout.Label("______________________________________________________________________");
-            switch (_selectedToolBarId)
-            {
-                case 0:
-                    MakeupIosUi();
-                    break;
-                case 1:
-                    MakeupAndroidUi();
-                    break;
-            }
+            GenerateWechat();
         }
 
-        /// <summary>
-        ///     初始化所有List
-        /// </summary>
-        private void InitAllList()
+        private void GenerateWechat()
         {
-            InitPodList();
-            InitSchemeList();
-            InitUrlTypeList();
-            InitAssociatedDomainsList();
-        }
-
-        #region Ios界面
-
-        /// <summary>
-        ///     初始化pod列表
-        /// </summary>
-        private void InitPodList()
-        {
-            _podList = new ReorderableList(_config.ios.cocoapods.podList, _config.ios.cocoapods.podList.GetType())
-            {
-                drawHeaderCallback = rect => { GUI.Label(rect, "pod列表"); },
-                drawElementCallback = (rect, index, isActive, isFocused) =>
-                {
-                    _config.ios.cocoapods.podList[index] =
-                        EditorGUI.TextField(rect, _config.ios.cocoapods.podList[index]);
-                },
-                onAddCallback = list => { _config.ios.cocoapods.podList.Add(""); }
-            };
-        }
-
-        /// <summary>
-        ///     初始化scheme列表
-        /// </summary>
-        private void InitSchemeList()
-        {
-            _schemeList = new ReorderableList(_config.ios.schemes, _config.ios.schemes.GetType())
-            {
-                drawHeaderCallback = rect => { GUI.Label(rect, "scheme列表"); },
-                drawElementCallback = (rect, index, isActive, isFocused) =>
-                {
-                    _config.ios.schemes[index] = EditorGUI.TextField(rect, _config.ios.schemes[index]);
-                },
-                onAddCallback = list => { _config.ios.schemes.Add(""); }
-            };
-        }
-
-        /// <summary>
-        ///     初始化urlType列表
-        /// </summary>
-        private void InitUrlTypeList()
-        {
-            _urlTypeList = new ReorderableList(_config.ios.urlTypes, _config.ios.urlTypes.GetType())
-            {
-                drawHeaderCallback = rect => { GUI.Label(rect, "urlType列表"); },
-                drawElementCallback = (rect, index, isActive, isFocused) =>
-                {
-                    var rect1 = new Rect(rect.x, rect.y, rect.width / 2, rect.height);
-                    var rect2 = new Rect(rect.x + rect.width / 2, rect.y, rect.width / 2, rect.height);
-                    _config.ios.urlTypes[index].id = EditorGUI.TextField(rect1, _config.ios.urlTypes[index].id);
-                    _config.ios.urlTypes[index].urlScheme =
-                        EditorGUI.TextField(rect2, _config.ios.urlTypes[index].urlScheme);
-                },
-                onAddCallback = list => { _config.ios.urlTypes.Add(new UrlType()); }
-            };
-        }
-
-        /// <summary>
-        ///     初始化跳转连接列表
-        /// </summary>
-        private void InitAssociatedDomainsList()
-        {
-            _associatedDomainsList =
-                new ReorderableList(_config.ios.associatedDomains, _config.ios.associatedDomains.GetType())
-                {
-                    drawHeaderCallback = rect => { GUI.Label(rect, "跳转链接列表"); },
-                    drawElementCallback = (rect, index, isActive, isFocused) =>
-                    {
-                        _config.ios.associatedDomains[index] =
-                            EditorGUI.TextField(rect, _config.ios.associatedDomains[index]);
-                    },
-                    onAddCallback = list => { _config.ios.associatedDomains.Add(""); }
-                };
-        }
-
-        /// <summary>
-        ///     ios 配置
-        /// </summary>
-        private void MakeupIosUi()
-        {
-            MakeupPodUi();
-            _schemeList.DoLayoutList();
-            _urlTypeList.DoLayoutList();
-            _associatedDomainsList.DoLayoutList();
-            _config.ios.bitCode = EditorGUILayout.Toggle("支持BitCode", _config.ios.bitCode);
-        }
-
-        /// <summary>
-        ///     android 配置
-        /// </summary>
-        private void MakeupAndroidUi()
-        {
-        }
-
-        /// <summary>
-        ///     pod列表
-        /// </summary>
-        private void MakeupPodUi()
-        {
-            _config.ios.cocoapods.enable =
-                EditorGUILayout.BeginToggleGroup("开启CocoaPods", _config.ios.cocoapods.enable);
-            EditorGUILayout.Foldout(_config.ios.cocoapods.enable, "CocoaPods配置");
+            _config.weChat.enable = EditorGUILayout.BeginToggleGroup("微信", _config.weChat.enable);
             EditorGUI.indentLevel++;
-            if (_config.ios.cocoapods.enable)
+            if (_config.weChat.enable)
             {
-                _config.ios.cocoapods.podUrl = EditorGUILayout.TextField("pod地址", _config.ios.cocoapods.podUrl);
-                _config.ios.cocoapods.podIosVersion =
-                    EditorGUILayout.TextField("ios版本", _config.ios.cocoapods.podIosVersion);
-                _podList.DoLayoutList();
+                _config.weChat.appId = EditorGUILayout.TextField("AppId", _config.weChat.appId);
             }
 
             EditorGUI.indentLevel--;
             EditorGUILayout.EndToggleGroup();
         }
-
-        #endregion
-
-        #region Android界面
-
-        #endregion
 
         #endregion
 

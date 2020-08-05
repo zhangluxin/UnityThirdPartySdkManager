@@ -1,6 +1,6 @@
 using UnityThirdPartySdkManager.Editor.Configs;
 
-namespace UnityThirdPartySdkManager.Editor.Generator
+namespace UnityThirdPartySdkManager.Editor.Generators
 {
     /// <summary>
     ///     android生成器

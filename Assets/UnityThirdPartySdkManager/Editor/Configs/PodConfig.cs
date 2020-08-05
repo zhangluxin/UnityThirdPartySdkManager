@@ -4,25 +4,20 @@ using System.Collections.Generic;
 namespace UnityThirdPartySdkManager.Editor.Configs
 {
     /// <summary>
-    ///     cocoa
+    /// cocospad配置
     /// </summary>
     [Serializable]
-    public class Cocoapods
+    public class PodConfig
     {
         /// <summary>
         ///     是否启用
         /// </summary>
-        public bool enable;
+        public bool enable = true;
 
         /// <summary>
         ///     pod库支持的ios版本
         /// </summary>
         public string podIosVersion = "10.0";
-
-        /// <summary>
-        ///     pod列表
-        /// </summary>
-        public List<string> podList;
 
         /// <summary>
         ///     pod库地址
