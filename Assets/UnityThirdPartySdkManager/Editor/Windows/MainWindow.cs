@@ -49,6 +49,11 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         private ReorderableList _associatedDomainsList;
 
         /// <summary>
+        ///     android gradle sdk 列表
+        /// </summary>
+        private ReorderableList _dependList;
+
+        /// <summary>
         ///     标签页位置（0为ios，1为安卓）
         /// </summary>
         private int _selectedToolBarId;
@@ -89,14 +94,21 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
             var config = ReadConfig();
+            Generator.Generator generator;
             switch (target)
             {
                 case BuildTarget.iOS:
-                    new IosGenerator(pathToBuiltProject, config).Run();
+                    generator = new IosGenerator(pathToBuiltProject, config);
                     break;
                 case BuildTarget.Android:
+                    generator = new AndroidGenerator(pathToBuiltProject, config);
                     break;
+                default:
+                    Debug.LogWarning("其他平台打包");
+                    return;
             }
+
+            generator.Run();
         }
 
         #endregion

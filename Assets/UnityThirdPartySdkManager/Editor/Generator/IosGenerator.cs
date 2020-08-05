@@ -13,41 +13,24 @@ namespace UnityThirdPartySdkManager.Editor.Generator
     /// <summary>
     ///     ios生成器
     /// </summary>
-    public class IosGenerator
+    public class IosGenerator : Generator
     {
-        /// <summary>
-        ///     配置
-        /// </summary>
-        private readonly Config _config;
-
-        /// <summary>
-        ///     项目路径
-        /// </summary>
-        private readonly string _pathToBuiltProject;
-
-        /// <summary>
-        ///     构造
-        /// </summary>
-        /// <param name="pathToBuiltProject">项目路径</param>
-        /// <param name="config">配置</param>
-        public IosGenerator(string pathToBuiltProject, Config config)
+        public IosGenerator(string pathToBuiltProject, Config config) : base(pathToBuiltProject, config)
         {
-            _config = config;
-            _pathToBuiltProject = pathToBuiltProject;
         }
 
         /// <summary>
         ///     生成
         /// </summary>
-        public void Run()
+        public override void Run()
         {
-            if (!Directory.Exists(_pathToBuiltProject))
+            if (!Directory.Exists(PathToBuiltProject))
             {
                 Debug.LogError("项目路径不存在");
                 return;
             }
 
-            if (_config.ios.cocoapods.enable) GeneratePodfile();
+            if (Config.ios.cocoapods.enable) GeneratePodfile();
 
             ModifyPbxproj();
             ModifyPlist();
@@ -59,16 +42,16 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// </summary>
         private void GeneratePodfile()
         {
-            var podfilePath = Path.Combine(_pathToBuiltProject, "Podfile");
+            var podfilePath = Path.Combine(PathToBuiltProject, "Podfile");
             if (File.Exists(podfilePath)) File.Delete(podfilePath);
 
             var streamWriter = new StreamWriter(podfilePath);
             var allstr = new StringBuilder();
-            allstr.Append($"source '{_config.ios.cocoapods.podUrl}'\n");
-            allstr.Append($"platform :ios, '{_config.ios.cocoapods.podIosVersion}'\n");
+            allstr.Append($"source '{Config.ios.cocoapods.podUrl}'\n");
+            allstr.Append($"platform :ios, '{Config.ios.cocoapods.podIosVersion}'\n");
             allstr.Append("\n");
             allstr.Append("target 'UnityFramework' do\n");
-            foreach (var pod in _config.ios.cocoapods.podList) allstr.Append($"pod '{pod}'\n");
+            foreach (var pod in Config.ios.cocoapods.podList) allstr.Append($"pod '{pod}'\n");
 
             allstr.Append("end\n");
             streamWriter.Write(allstr);
@@ -78,7 +61,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
                 StartInfo =
                 {
                     FileName = "/usr/local/bin/pod",
-                    Arguments = $"install --project-directory={_pathToBuiltProject}",
+                    Arguments = $"install --project-directory={PathToBuiltProject}",
                     UseShellExecute = false,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     CreateNoWindow = true,
@@ -97,13 +80,13 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// </summary>
         private void ModifyPbxproj()
         {
-            var pbxprojPath = PBXProject.GetPBXProjectPath(_pathToBuiltProject);
+            var pbxprojPath = PBXProject.GetPBXProjectPath(PathToBuiltProject);
             var pbxProject = new PBXProject();
             pbxProject.ReadFromFile(pbxprojPath);
             var frameworkTarget = pbxProject.GetUnityFrameworkTargetGuid();
-            if (!string.IsNullOrEmpty(_config.ios.sdkPath))
-                AddSdkFiles(pbxProject, frameworkTarget, _config.ios.sdkPath);
-            if (!_config.ios.bitCode)
+            if (!string.IsNullOrEmpty(Config.ios.sdkPath))
+                AddSdkFiles(pbxProject, frameworkTarget, Config.ios.sdkPath);
+            if (!Config.ios.bitCode)
                 CloseBitCode(pbxProject, frameworkTarget);
             var prejectTarget = pbxProject.GetUnityMainTargetGuid();
             pbxProject.AddCapability(prejectTarget, PBXCapabilityType.InAppPurchase, "ios.entitlements");
@@ -159,13 +142,13 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// </summary>
         private void ModifyPlist()
         {
-            var plistPath = Path.Combine(_pathToBuiltProject, "Info.plist");
+            var plistPath = Path.Combine(PathToBuiltProject, "Info.plist");
             var plistDocument = new PlistDocument();
             plistDocument.ReadFromFile(plistPath);
-            if (_config.ios.schemes.Count > 0)
-                AddSchemes(plistDocument, _config.ios.schemes);
-            if (_config.ios.urlTypes.Count > 0)
-                AddUrlTypes(plistDocument, _config.ios.urlTypes);
+            if (Config.ios.schemes.Count > 0)
+                AddSchemes(plistDocument, Config.ios.schemes);
+            if (Config.ios.urlTypes.Count > 0)
+                AddUrlTypes(plistDocument, Config.ios.urlTypes);
             plistDocument.WriteToFile(plistPath);
         }
 
@@ -174,7 +157,7 @@ namespace UnityThirdPartySdkManager.Editor.Generator
         /// </summary>
         private void AddCapability(ProjectCapabilityManager capManager)
         {
-            var arr = _config.ios.associatedDomains.ToArray();
+            var arr = Config.ios.associatedDomains.ToArray();
             for (var i = 0; i < arr.Length; i++)
                 if (!arr[i].StartsWith("applinks:"))
                     arr[i] = $"applinks:{arr[i]}";
