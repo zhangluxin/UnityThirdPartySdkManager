@@ -33,5 +33,10 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         /// 跳转链接
         /// </summary>
         public List<string> associatedDomains = new List<string>(new[] {"ulink.ilemen.net"});
+
+        /// <summary>
+        /// sdk相关文件（只放可编译文件）
+        /// </summary>
+        public readonly List<string> SdkFileList = new List<string>(new[] {"Plugins/iOS/WeChat/WeChatSdk.mm"});
     }
 }

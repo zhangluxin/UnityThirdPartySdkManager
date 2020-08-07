@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor.iOS.Xcode;
-using UnityEngine;
 using UnityThirdPartySdkManager.Editor.Configs;
 using Debug = UnityEngine.Debug;
 
@@ -99,8 +98,7 @@ namespace UnityThirdPartySdkManager.Editor.Generators
             var pbxProject = new PBXProject();
             pbxProject.ReadFromFile(pbxprojPath);
             var frameworkTarget = pbxProject.GetUnityFrameworkTargetGuid();
-            // if (!string.IsNullOrEmpty(Config.ios.sdkPath))
-            //     AddSdkFiles(pbxProject, frameworkTarget, Config.ios.sdkPath);
+            ModifySdkFiles(pbxProject, frameworkTarget);
             if (!Config.ios.bitCode)
                 CloseBitCode(pbxProject, frameworkTarget);
             var prejectTarget = pbxProject.GetUnityMainTargetGuid();
@@ -111,37 +109,84 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         }
 
         /// <summary>
-        ///     添加sdk文件
+        /// 修改sdk文件
         /// </summary>
-        /// <param name="pbxProject">打包工程路径</param>
-        /// <param name="target">配置的target("默认为UnityFramework")</param>
-        /// <param name="iosSdkPath">sdk路径</param>
-        private static void AddSdkFiles(PBXProject pbxProject, string target, string iosSdkPath)
+        /// <param name="pbxProject"></param>
+        /// <param name="target"></param>
+        private void ModifySdkFiles(PBXProject pbxProject, string target)
         {
-            var sdkPath = Path.Combine(Application.dataPath, "..", iosSdkPath);
-            if (!Directory.Exists(sdkPath)) return;
-            var directory = new DirectoryInfo(sdkPath);
-            AddFiles(directory, pbxProject, target, "Sdks");
+            // 原本想的是添加法，试试改成删除法
+            // if (!string.IsNullOrEmpty(Config.ios.sdkPath))
+            //     AddSdkFiles(pbxProject, frameworkTarget, Config.ios.sdkPath);
+            if (!Config.weChat.enable)
+            {
+                RemoveSdkFiles(pbxProject, target, Config.weChat.SdkFileList);
+            }
         }
 
         /// <summary>
-        ///     添加文件
+        /// 删除sdk文件
         /// </summary>
-        /// <param name="directory">目录</param>
-        /// <param name="pbxProject">打包工程</param>
-        /// <param name="target">配置的target("默认为UnityFramework")</param>
-        /// <param name="path">路径</param>
-        private static void AddFiles(DirectoryInfo directory, PBXProject pbxProject, string target, string path)
+        private static void RemoveSdkFiles(PBXProject pbxProject, string target, IEnumerable<string> sdkFileList)
         {
-            foreach (var file in directory.GetFiles())
+            foreach (var sdkFile in sdkFileList)
             {
-                var fileGuid = pbxProject.AddFile(file.FullName, $"{path}/{file.Name}", PBXSourceTree.Build);
-                pbxProject.AddFileToBuild(target, fileGuid);
+                RemoveFile(pbxProject, target, sdkFile);
+            }
+        }
+
+        /// <summary>
+        /// 删除sdk文件
+        /// </summary>
+        private static void RemoveFile(PBXProject pbxProject, string target, string iosSdkPath)
+        {
+            if (!iosSdkPath.StartsWith("Libraries"))
+            {
+                iosSdkPath = $"Libraries/UnityThirdPartySdkManager/{iosSdkPath}";
             }
 
-            foreach (var directoryInfo in directory.GetDirectories())
-                AddFiles(directoryInfo, pbxProject, target, $"{path}/{directoryInfo.Name}");
+            var fileguid = pbxProject.FindFileGuidByProjectPath(iosSdkPath);
+            Debug.Log($"fileguid = {fileguid}");
+            if (fileguid == null)
+            {
+                return;
+            }
+
+            pbxProject.RemoveFileFromBuild(target, fileguid);
         }
+
+        // /// <summary>
+        // ///     添加sdk文件
+        // /// </summary>
+        // /// <param name="pbxProject">打包工程路径</param>
+        // /// <param name="target">配置的target("默认为UnityFramework")</param>
+        // /// <param name="iosSdkPath">sdk路径</param>
+        // private static void AddSdkFiles(PBXProject pbxProject, string target, string iosSdkPath)
+        // {
+        //     var sdkPath = Path.Combine(Application.dataPath, "..", iosSdkPath);
+        //     if (!Directory.Exists(sdkPath)) return;
+        //     var directory = new DirectoryInfo(sdkPath);
+        //     AddFiles(directory, pbxProject, target, "Sdks");
+        // }
+        //
+        // /// <summary>
+        // ///     添加文件
+        // /// </summary>
+        // /// <param name="directory">目录</param>
+        // /// <param name="pbxProject">打包工程</param>
+        // /// <param name="target">配置的target("默认为UnityFramework")</param>
+        // /// <param name="path">路径</param>
+        // private static void AddFiles(DirectoryInfo directory, PBXProject pbxProject, string target, string path)
+        // {
+        //     foreach (var file in directory.GetFiles())
+        //     {
+        //         var fileGuid = pbxProject.AddFile(file.FullName, $"{path}/{file.Name}", PBXSourceTree.Build);
+        //         pbxProject.AddFileToBuild(target, fileGuid);
+        //     }
+        //
+        //     foreach (var directoryInfo in directory.GetDirectories())
+        //         AddFiles(directoryInfo, pbxProject, target, $"{path}/{directoryInfo.Name}");
+        // }
 
         /// <summary>
         ///     关掉bitcode
@@ -193,8 +238,11 @@ namespace UnityThirdPartySdkManager.Editor.Generators
             list.AddRange(Config.ios.urlTypes);
             if (Config.weChat.enable)
             {
-                var urltype = new UrlType {id = "wexin", urlScheme = Config.weChat.appId};
-                list.Add(urltype);
+                var idUrltype = new UrlType {id = "wexin", urlScheme = Config.weChat.appId};
+                list.Add(idUrltype);
+                var linkUrltype = new UrlType
+                    {id = "ulink", urlScheme = string.Join(",", Config.weChat.associatedDomains.ToArray())};
+                list.Add(linkUrltype);
             }
 
             return list;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
@@ -76,9 +77,9 @@ namespace UnityThirdPartySdkManager.Editor.Windows
 
             generator.Run();
         }
-        
+
         #endregion
-        
+
         #region 生命周期
 
         private void OnEnable()
