@@ -37,6 +37,6 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         /// <summary>
         /// sdk相关文件（只放可编译文件）
         /// </summary>
-        public readonly List<string> SdkFileList = new List<string>(new[] {"Plugins/iOS/WeChat/WeChatSdk.mm"});
+        public readonly List<string> SdkFileList = new List<string>(new[] {"Plugins/iOS/WeChat/WeChatUtil.mm"});
     }
 }

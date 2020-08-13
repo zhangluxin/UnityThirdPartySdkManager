@@ -29,12 +29,12 @@ namespace UnityThirdPartySdkManager.Editor.Generators
                 return;
             }
 
+            GeneratePretreatment();
             if (Config.ios.pod.enable) GeneratePodfile();
 
             ModifyPbxproj();
             ModifyPlist();
         }
-
 
         /// <summary>
         ///     生成pod文件
@@ -275,6 +275,16 @@ namespace UnityThirdPartySdkManager.Editor.Generators
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// 修改预处理
+        /// </summary>
+        private void GeneratePretreatment()
+        {
+            if (!Config.weChat.enable)
+            {
+            }
         }
 
         /// <summary>

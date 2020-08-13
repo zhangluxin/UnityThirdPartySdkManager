@@ -33,6 +33,6 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         /// </summary>
         public virtual void Run()
         {
-        } 
+        }
     }
 }
