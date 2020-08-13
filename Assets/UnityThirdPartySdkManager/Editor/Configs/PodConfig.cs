@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 
 namespace UnityThirdPartySdkManager.Editor.Configs
 {
     /// <summary>
-    /// cocospad配置
+    ///     cocospad配置
     /// </summary>
     [Serializable]
     public class PodConfig

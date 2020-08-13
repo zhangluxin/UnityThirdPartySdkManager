@@ -3,7 +3,7 @@ using UnityThirdPartySdkManager.Editor.Configs;
 namespace UnityThirdPartySdkManager.Editor.Generators
 {
     /// <summary>
-    /// 生成器基类
+    ///     生成器基类
     /// </summary>
     public abstract class Generator
     {
@@ -18,7 +18,7 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         protected readonly string pathToBuiltProject;
 
         /// <summary>
-        /// 构造
+        ///     构造
         /// </summary>
         /// <param name="pathToBuiltProject"></param>
         /// <param name="config"></param>

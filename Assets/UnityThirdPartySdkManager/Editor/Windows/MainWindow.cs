@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
@@ -104,7 +103,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         #region 界面方法
 
         /// <summary>
-        /// 生成ui
+        ///     生成ui
         /// </summary>
         private void GenerateUi()
         {
@@ -116,10 +115,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         {
             _config.weChat.enable = EditorGUILayout.BeginToggleGroup("微信", _config.weChat.enable);
             EditorGUI.indentLevel++;
-            if (_config.weChat.enable)
-            {
-                _config.weChat.appId = EditorGUILayout.TextField("AppId", _config.weChat.appId);
-            }
+            if (_config.weChat.enable) _config.weChat.appId = EditorGUILayout.TextField("AppId", _config.weChat.appId);
 
             EditorGUI.indentLevel--;
             EditorGUILayout.EndToggleGroup();

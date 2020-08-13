@@ -11,10 +11,9 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         {
         }
 
-        
+
         public override void Run()
         {
-            
         }
     }
 }
