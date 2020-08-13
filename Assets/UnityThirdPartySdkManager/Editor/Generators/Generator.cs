@@ -10,12 +10,12 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         /// <summary>
         ///     配置
         /// </summary>
-        protected readonly Config Config;
+        protected readonly Config config;
 
         /// <summary>
         ///     项目路径
         /// </summary>
-        protected readonly string PathToBuiltProject;
+        protected readonly string pathToBuiltProject;
 
         /// <summary>
         /// 构造
@@ -24,8 +24,8 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         /// <param name="config"></param>
         protected Generator(string pathToBuiltProject, Config config)
         {
-            Config = config;
-            PathToBuiltProject = pathToBuiltProject;
+            this.config = config;
+            this.pathToBuiltProject = pathToBuiltProject;
         }
 
         /// <summary>

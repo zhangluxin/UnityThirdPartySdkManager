@@ -23,14 +23,14 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         /// </summary>
         public override void Run()
         {
-            if (!Directory.Exists(PathToBuiltProject))
+            if (!Directory.Exists(pathToBuiltProject))
             {
                 Debug.LogError("项目路径不存在");
                 return;
             }
 
             GeneratePretreatment();
-            if (Config.ios.pod.enable) GeneratePodfile();
+            if (config.ios.pod.enable) GeneratePodfile();
 
             ModifyPbxproj();
             ModifyPlist();
@@ -41,13 +41,13 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         /// </summary>
         private void GeneratePodfile()
         {
-            var podfilePath = Path.Combine(PathToBuiltProject, "Podfile");
+            var podfilePath = Path.Combine(pathToBuiltProject, "Podfile");
             if (File.Exists(podfilePath)) File.Delete(podfilePath);
 
             var streamWriter = new StreamWriter(podfilePath);
             var allstr = new StringBuilder();
-            allstr.Append($"source '{Config.ios.pod.podUrl}'\n");
-            allstr.Append($"platform :ios, '{Config.ios.pod.podIosVersion}'\n");
+            allstr.Append($"source '{config.ios.pod.podUrl}'\n");
+            allstr.Append($"platform :ios, '{config.ios.pod.podIosVersion}'\n");
             allstr.Append("\n");
             allstr.Append("target 'UnityFramework' do\n");
             foreach (var pod in GeneratePodList()) allstr.Append($"pod '{pod}'\n");
@@ -60,7 +60,7 @@ namespace UnityThirdPartySdkManager.Editor.Generators
                 StartInfo =
                 {
                     FileName = "/usr/local/bin/pod",
-                    Arguments = $"install --project-directory={PathToBuiltProject}",
+                    Arguments = $"install --project-directory={pathToBuiltProject}",
                     UseShellExecute = false,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     CreateNoWindow = true,
@@ -81,9 +81,9 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         private IEnumerable<string> GeneratePodList()
         {
             var list = new List<string>();
-            if (Config.weChat.enable)
+            if (config.weChat.enable)
             {
-                list.Add(Config.weChat.pod);
+                list.Add(config.weChat.pod);
             }
 
             return list;
@@ -94,12 +94,12 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         /// </summary>
         private void ModifyPbxproj()
         {
-            var pbxprojPath = PBXProject.GetPBXProjectPath(PathToBuiltProject);
+            var pbxprojPath = PBXProject.GetPBXProjectPath(pathToBuiltProject);
             var pbxProject = new PBXProject();
             pbxProject.ReadFromFile(pbxprojPath);
             var frameworkTarget = pbxProject.GetUnityFrameworkTargetGuid();
             ModifySdkFiles(pbxProject, frameworkTarget);
-            if (!Config.ios.bitCode)
+            if (!config.ios.bitCode)
                 CloseBitCode(pbxProject, frameworkTarget);
             var prejectTarget = pbxProject.GetUnityMainTargetGuid();
             pbxProject.AddCapability(prejectTarget, PBXCapabilityType.InAppPurchase, "ios.entitlements");
@@ -118,10 +118,10 @@ namespace UnityThirdPartySdkManager.Editor.Generators
             // 原本想的是添加法，试试改成删除法
             // if (!string.IsNullOrEmpty(Config.ios.sdkPath))
             //     AddSdkFiles(pbxProject, frameworkTarget, Config.ios.sdkPath);
-            if (!Config.weChat.enable)
-            {
-                RemoveSdkFiles(pbxProject, target, Config.weChat.SdkFileList);
-            }
+            // if (!config.weChat.enable)
+            // {
+            //     RemoveSdkFiles(pbxProject, target, config.weChat.sdkFileList);
+            // }
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         /// </summary>
         private void ModifyPlist()
         {
-            var plistPath = Path.Combine(PathToBuiltProject, "Info.plist");
+            var plistPath = Path.Combine(pathToBuiltProject, "Info.plist");
             var plistDocument = new PlistDocument();
             plistDocument.ReadFromFile(plistPath);
             var schemes = GenerateSchemeList();
@@ -220,9 +220,9 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         private List<string> GenerateSchemeList()
         {
             var list = new List<string>();
-            if (Config.weChat.enable)
+            if (config.weChat.enable)
             {
-                list.AddRange(Config.weChat.schemes);
+                list.AddRange(config.weChat.schemes);
             }
 
             return list;
@@ -235,13 +235,13 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         private List<UrlType> GenerateUrlTypes()
         {
             var list = new List<UrlType>();
-            list.AddRange(Config.ios.urlTypes);
-            if (Config.weChat.enable)
+            list.AddRange(config.ios.urlTypes);
+            if (config.weChat.enable)
             {
-                var idUrltype = new UrlType {id = "wexin", urlScheme = Config.weChat.appId};
+                var idUrltype = new UrlType {id = "wexin", urlScheme = config.weChat.appId};
                 list.Add(idUrltype);
                 var linkUrltype = new UrlType
-                    {id = "ulink", urlScheme = string.Join(",", Config.weChat.associatedDomains.ToArray())};
+                    {id = "ulink", urlScheme = string.Join(",", config.weChat.associatedDomains.ToArray())};
                 list.Add(linkUrltype);
             }
 
@@ -269,9 +269,9 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         private List<string> GenerateAssociatedDomainList()
         {
             var list = new List<string>();
-            if (Config.weChat.enable)
+            if (config.weChat.enable)
             {
-                list.AddRange(Config.weChat.associatedDomains);
+                list.AddRange(config.weChat.associatedDomains);
             }
 
             return list;
@@ -282,9 +282,21 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         /// </summary>
         private void GeneratePretreatment()
         {
-            if (!Config.weChat.enable)
-            {
-            }
+            var pretreatmentFile = Path.Combine(pathToBuiltProject, "Libraries", "UnityThirdPartySdkManager", "Plugins",
+                "iOS", "Common", "Pretreatment.h");
+            var streamWriter = new StreamWriter(pretreatmentFile);
+            var allstr = new StringBuilder();
+            allstr.Append("#pragma once\n");
+            allstr.Append("\n");
+            allstr.Append("#ifndef SDK_PRETREATMENT_DEF\n");
+            allstr.Append("\n");
+            allstr.Append("#define SDK_PRETREATMENT_DEF true\n");
+            allstr.Append($"#define SDK_WECHAT_ENABLE {config.weChat.enable.ToString().ToLower()}\n");
+            allstr.Append("\n");
+            allstr.Append("#endif\n");
+            allstr.Append("\n");
+            streamWriter.Write(allstr);
+            streamWriter.Close();
         }
 
         /// <summary>
