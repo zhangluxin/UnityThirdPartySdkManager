@@ -20,4 +20,26 @@
     return nil;
 }
 
++ (UIImage *)imageCompressWithSimple:(UIImage *)image {
+    CGFloat width = image.size.width;
+    CGFloat height = image.size.height;
+    CGFloat newWidth;
+    CGFloat newHeight;
+    if (width > height) {
+        newWidth = 300;
+        newHeight = 300 * height / width;
+    } else {
+        newHeight = 300;
+        newWidth = 300 * width / height;
+    }
+    CGSize size;
+    size.width = newWidth;
+    size.height = newHeight;
+    UIGraphicsBeginImageContext(size);
+    [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
 @end

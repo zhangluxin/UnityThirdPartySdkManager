@@ -9,6 +9,9 @@ NS_ASSUME_NONNULL_BEGIN
 // 从urlType里面取id
 + (NSString *)getIdFromUrlTypes:(NSString *)key;
 
+// 图片压缩
++ (UIImage *)imageCompressWithSimple:(UIImage *)image;
+
 @end
 
 NS_ASSUME_NONNULL_END
