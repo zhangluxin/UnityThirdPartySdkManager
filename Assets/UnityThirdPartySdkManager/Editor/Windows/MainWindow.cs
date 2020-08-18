@@ -8,6 +8,9 @@ using UnityThirdPartySdkManager.Editor.Generators;
 
 namespace UnityThirdPartySdkManager.Editor.Windows
 {
+    /// <summary>
+    /// 主界面
+    /// </summary>
     public class MainWindow : EditorWindow
     {
         #region 变量定义
@@ -109,6 +112,7 @@ namespace UnityThirdPartySdkManager.Editor.Windows
         {
             GUILayout.Label("Sdk列表", EditorStyles.boldLabel);
             GenerateWechat();
+            GenerateBaiduMap();
         }
 
         private void GenerateWechat()
@@ -116,6 +120,21 @@ namespace UnityThirdPartySdkManager.Editor.Windows
             _config.weChat.enable = EditorGUILayout.BeginToggleGroup("微信", _config.weChat.enable);
             EditorGUI.indentLevel++;
             if (_config.weChat.enable) _config.weChat.appId = EditorGUILayout.TextField("AppId", _config.weChat.appId);
+
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndToggleGroup();
+        }
+
+        private void GenerateBaiduMap()
+        {
+            _config.baiduMap.enable = EditorGUILayout.BeginToggleGroup("微信", _config.baiduMap.enable);
+            EditorGUI.indentLevel++;
+            if (_config.baiduMap.enable)
+            {
+                _config.baiduMap.iOSAppId = EditorGUILayout.TextField("iOS AppId", _config.baiduMap.iOSAppId);
+                _config.baiduMap.androidAppId =
+                    EditorGUILayout.TextField("Android AppId", _config.baiduMap.androidAppId);
+            }
 
             EditorGUI.indentLevel--;
             EditorGUILayout.EndToggleGroup();

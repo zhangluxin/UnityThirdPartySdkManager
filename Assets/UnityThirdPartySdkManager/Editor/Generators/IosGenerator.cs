@@ -82,6 +82,7 @@ namespace UnityThirdPartySdkManager.Editor.Generators
         {
             var list = new List<string>();
             if (config.weChat.enable) list.Add(config.weChat.pod);
+            if (config.baiduMap.enable) list.Add(config.baiduMap.pod);
 
             return list;
         }
@@ -158,6 +159,12 @@ namespace UnityThirdPartySdkManager.Editor.Generators
                 list.Add(linkUrltype);
             }
 
+            if (config.baiduMap.enable)
+            {
+                var idUrltype = new UrlType {id = "baidu", urlScheme = $"baidu{config.baiduMap.iOSAppId}"};
+                list.Add(idUrltype);
+            }
+
             return list;
         }
 
@@ -202,6 +209,7 @@ namespace UnityThirdPartySdkManager.Editor.Generators
             allstr.Append("\n");
             allstr.Append("#define SDK_PRETREATMENT_DEF true\n");
             allstr.Append($"#define SDK_WECHAT_ENABLE {config.weChat.enable.ToString().ToLower()}\n");
+            allstr.Append($"#define SDK_BAIDUMAP_ENABLE {config.baiduMap.enable.ToString().ToLower()}\n");
             allstr.Append("\n");
             allstr.Append("#endif\n");
             allstr.Append("\n");

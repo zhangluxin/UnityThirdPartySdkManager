@@ -10,11 +10,6 @@ namespace UnityThirdPartySdkManager.Editor.Configs
     public class WeChatConfig
     {
         /// <summary>
-        ///     sdk相关文件（只放可编译文件）
-        /// </summary>
-        public readonly List<string> sdkFileList = new List<string>(new[] {"Plugins/iOS/WeChat/WeChatUtil.mm"});
-
-        /// <summary>
         ///     appid
         /// </summary>
         public string appId;
@@ -33,6 +28,11 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         ///     pod名
         /// </summary>
         public string pod = "WechatOpenSDK";
+
+        /// <summary>
+        /// gradle依赖
+        /// </summary>
+        public string depend = "com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+";
 
         /// <summary>
         ///     scheme

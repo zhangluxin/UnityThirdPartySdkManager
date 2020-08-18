@@ -22,5 +22,10 @@ namespace UnityThirdPartySdkManager.Editor.Configs
         ///     微信配置
         /// </summary>
         public WeChatConfig weChat;
+
+        /// <summary>
+        /// 百度地图配置
+        /// </summary>
+        public BaiduMapConfig baiduMap;
     }
 }
